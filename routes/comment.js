@@ -16,7 +16,6 @@ router.post("/create/comment", ensureAuth, async (req, res) => {
       author: author.displayName,
       authorImage: author.image,
     });
-    console.log(comment);
     res.status(200).send(comment);
   } catch (error) {
     console.log(error);
