@@ -11,11 +11,16 @@ const connectDB = () => {
     }).catch((error) => {
       connectionPromise = undefined;
       // Connection errors can contain credentials or infrastructure details.
-      const names = ["Error", "TypeError", "URIError", "MongooseError", "MongoParseError", "MongoServerError", "MongoServerSelectionError", "MongooseServerSelectionError", "MongoNetworkError"];
-      const name = names.includes(error.name) ? error.name : "DatabaseError";
+      const name = /^[A-Za-z]{0,48}Error$/.test(error.name) ? error.name : "DatabaseError";
       const codes = ["ENOTFOUND", "ENODATA", "EBADNAME", "EAI_AGAIN", "ETIMEDOUT", "ECONNREFUSED", "ERR_INVALID_URL"];
       const code = typeof error.code === "number" || codes.includes(error.code) ? error.code : "unavailable";
-      console.error("Database connection unavailable:", name, code);
+      const message = String(error.message || "");
+      const category = /auth|password|credential/i.test(message) ? "authentication"
+        : /querySrv|queryTxt|getaddrinfo|ENOTFOUND|EBADNAME/i.test(message) ? "DNS"
+        : /URI|URL|scheme|connection string|unescaped/i.test(message) ? "connection string format"
+        : /TLS|SSL|certificate|server selection|timed out/i.test(message) ? "network connection"
+        : "connection failure";
+      console.error("Database connection unavailable:", name, code, category);
       throw new Error("Database connection unavailable");
     });
   }
