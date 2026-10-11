@@ -4,8 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "build": "esbuild node_modules/sanitize-html/index.js --bundle --platform=node --target=node24 --format=cjs --outfile=config/sanitizer.cjs --legal-comments=inline",
+    "prestart": "npm run build",
     "start": "node --env-file-if-exists=.env app.js",
-    "test": "node --test --test-concurrency=1"
+    "pretest": "npm run build",
+    "test": "node --no-experimental-require-module --test --test-concurrency=1"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +18,7 @@
     "@aws-sdk/s3-request-presigner": "^3.345.0",
     "connect-mongo": "^5.1.0",
     "ejs": "^3.1.9",
+    "esbuild": "0.28.2",
     "express": "^4.18.2",
     "express-session": "^1.17.1",
     "moment": "^2.29.4",
