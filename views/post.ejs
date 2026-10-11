@@ -296,6 +296,9 @@
     </script>
 
     <script>
+      const escapeCommentHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      }[character]));
       const loadReplies = async (parentID, parentDepth) => {
         try {
           const res = await fetch(
@@ -318,13 +321,13 @@
             commentBox.innerHTML = `<img
               alt="Image placeholder"
               class="rounded-circle shadow mr-4"
-              src="${comment.authorImage}"
+              src="${escapeCommentHtml(comment.authorImage)}"
               style="width: 64px; height: 64px"
             />
             <div class="media-body" id="comment-${comment._id}">
               <div class="media-comment-bubble left-top">
-                <h6 class="mt-0">${comment.author}</h6>
-                <p class="text-sm lh-160"> ${comment.commentText} </p>
+                <h6 class="mt-0">${escapeCommentHtml(comment.author)}</h6>
+                <p class="text-sm lh-160"> ${escapeCommentHtml(comment.commentText)} </p>
                 <div class="icon-actions">
                   <button
                     href="blog-article.html#"

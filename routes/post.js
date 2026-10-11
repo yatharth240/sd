@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const moment = require("moment");
+const sanitizeHtml = require("sanitize-html");
 
 const { ensureAuth } = require("../middleware/auth");
 const { ensureSignUp, ensureCreator } = require("../middleware/user");
@@ -30,10 +31,11 @@ router.post(
     try {
       const user = req.user;
       const post = await Post.create({
-        ...req.body,
+        title: req.body.title,
+        subTitle: req.body.subTitle,
+        description: sanitizeHtml(req.body.description || ""),
         userID: user._id,
       });
-      console.log(post);
 
       res.status(200).send(post);
     } catch (error) {
@@ -57,7 +59,7 @@ router.get("/post/:id", ensureAuth, async (req, res) => {
 
     const comments = await Comment.find({ postID: postID, depth: 1 });
 
-    res.locals.post = post;
+    res.locals.post = { ...post.toObject(), description: sanitizeHtml(post.description) };
     res.locals.comments = comments;
     res.locals.author = author;
     res.locals.postDate = postDate;
