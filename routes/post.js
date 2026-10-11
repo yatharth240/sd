@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const moment = require("moment");
-const sanitizeHtml = require("sanitize-html");
+const sanitizeHtml = require("../config/sanitizer.cjs");
 
 const { ensureAuth } = require("../middleware/auth");
 const { ensureSignUp, ensureCreator } = require("../middleware/user");

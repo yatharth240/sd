@@ -4,3 +4,4 @@
 !.env.example
 .vercel
 *.log
+/config/sanitizer.cjs
