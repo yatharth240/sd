@@ -14,12 +14,18 @@ router.patch("/profile", ensureAuth, ensureSignUp, async (req, res) => {
     const profileData = req.body;
     const user = req.user;
 
-    for (const key in profileData) {
-      user[key] = profileData[key];
+    const editableFields = ["displayName", "firstName", "lastName", "phone", "gender", "about", "birthdate", "image", "cover"];
+    for (const key of editableFields) {
+      if (Object.hasOwn(profileData, key)) {
+        if (typeof profileData[key] !== "string") return res.status(400).json({ error: "Invalid profile field" });
+        if (["image", "cover"].includes(key) && !/^https:\/\//.test(profileData[key])) {
+          return res.status(400).json({ error: "Image URL must use HTTPS" });
+        }
+        user[key] = profileData[key];
+      }
     }
 
     await user.save();
-    console.log(user);
 
     res.status(200).send(user);
   } catch (error) {
