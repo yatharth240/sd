@@ -22,7 +22,11 @@ router.patch(
   async (req, res) => {
     try {
       const user = req.user;
-      user.role = Number(req.body.role);
+      const role = Number(req.body.role);
+      if (req.body.role === undefined || req.body.role === null || ![0, 1].includes(role)) {
+        return res.status(400).json({ error: "Choose a creator or student role" });
+      }
+      user.role = role;
       await user.save();
       res.status(200).send({});
     } catch (error) {
