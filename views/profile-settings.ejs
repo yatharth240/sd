@@ -367,11 +367,13 @@
   changeAvatarForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const avatarFile = document.querySelector("#avatar").files[0];
+    if (!avatarFile) return alert("Choose an image first");
     const urlResponse = await fetch(
-      `/get/preSignedURL?fileName=${avatarFile.name}&contentType=${avatarFile.type}`,
+      `/get/preSignedURL?fileName=${encodeURIComponent(avatarFile.name)}&contentType=${encodeURIComponent(avatarFile.type)}`,
       { method: "GET" }
     );
     const urlData = await urlResponse.json();
+    if (!urlResponse.ok) return alert(urlData.error || "Could not upload this image");
 
     const uploadResponse = await fetch(urlData.url, {
       method: "PUT",
@@ -380,6 +382,7 @@
       },
       body: avatarFile,
     });
+    if (!uploadResponse.ok) return alert("The image upload failed. Please try again.");
 
     const response = await fetch("/profile", {
       method: "PATCH",
@@ -387,7 +390,7 @@
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        image: `https://d1ecyonmvcaoie.cloudfront.net/${urlData.fileName}`,
+        image: urlData.publicUrl,
       }),
     });
 
